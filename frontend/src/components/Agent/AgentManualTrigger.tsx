@@ -11,6 +11,7 @@ const AgentManualTriggerComponent = ({ agent }: { agent?: IAgent }) => {
         queryKey: ['functions'],
         queryFn: fetchFunctions
     });
+    console.log('asdas', functions);
     return (
         <div className={'flex h-full w-full flex-col gap-10'}>
             <div className={'flex items-center gap-3'}>

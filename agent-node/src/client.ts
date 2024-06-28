@@ -63,6 +63,7 @@ export async function handleIncomingMessage(
             console.log('Received Agent Keys: ', message.payload)
             globalState.agentWalletDetails = message.payload
         } else if (message.message === 'trigger_action') {
+            console.log('Received Manual trigger action : ', message.payload)
             const { action, probability } = message.payload
             triggerAction(action, probability, 'MANUAL')
         } else if (message.message === 'on_chain_tx') {

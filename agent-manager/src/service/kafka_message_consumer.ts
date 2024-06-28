@@ -16,11 +16,13 @@ const manualTriggerConsumer = kafka.consumer({
 })
 
 export async function initKafkaConsumers() {
-    consumer.connect()
-    consumer.subscribe({
+    await consumer.connect()
+    await consumer.subscribe({
         topic: 'trigger_config_updates',
         fromBeginning: true,
     })
+    await manualTriggerConsumer.connect()
+    await manualTriggerConsumer.subscribe({ topic: 'manual_trigger_event' })
 
     consumer.run({
         eachMessage: async ({ message }) => {
@@ -35,16 +37,17 @@ export async function initKafkaConsumers() {
         },
     })
 
-    manualTriggerConsumer.connect()
-    manualTriggerConsumer.subscribe({ topic: 'manual_trigger_event' })
-
     manualTriggerConsumer.run({
         eachMessage: async ({ message }) => {
             const agentId = message.key?.toString()
             const actionName = message.value?.toString()
             const parsedActionName = JSON.parse(actionName || '')
             if (agentId && parsedActionName) {
-                console.log('manual trigger starting', parsedActionName)
+                console.log(
+                    'manual trigger starting',
+                    parsedActionName,
+                    agentId
+                )
                 manager.sendToWebSocket(agentId, {
                     message: 'trigger_action',
                     payload: {

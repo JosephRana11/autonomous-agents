@@ -73,7 +73,7 @@ interface FunctionData {
 export const handleTransaction = async (
     message: any,
     agentId: string
-): Promise<void> => {
+): Promise<any> => {
     if (message != 'Ping' || message == 'proposal') {
         // Parse the JSON string into a JavaScript object
         const data: FunctionData = JSON.parse(message)
@@ -86,7 +86,6 @@ export const handleTransaction = async (
                 try {
                     const response = await fetch(kuberUrl, options)
                     if (!response.ok) {
-                        console.log('failed reques', options)
                         const responseBody = await response.text()
                         let responseJson
                         try {
@@ -114,12 +113,12 @@ export const handleTransaction = async (
                         data.triggerType,
                         kuberData.hash
                     )
+                    return `Kuber Response:  ${data.action.function_name}: ${kuberData}`
                 } catch (error: any) {
-                    console.error(
-                        'Error submitting transaction:',
+                    console.log(
+                        `Error submitting transaction: ${error.message} having option body : ${options.body}`,
                         error.message
                     )
-                    console.log('failed request:', options.body)
                     await saveTriggerHistory(
                         agentId,
                         data.action.function_name,
@@ -129,6 +128,7 @@ export const handleTransaction = async (
                         data.triggerType,
                         ''
                     )
+                    return `Error submitting transaction : ${error.message}`
                 }
             } else {
                 await saveTriggerHistory(
@@ -140,6 +140,7 @@ export const handleTransaction = async (
                     'CRON',
                     ''
                 )
+                return 'Action has been skipped'
             }
         }
     }

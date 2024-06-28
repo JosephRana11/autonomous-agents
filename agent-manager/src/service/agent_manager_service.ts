@@ -3,8 +3,8 @@ import { parseRawBlockBody } from 'libcardano/cardano/ledger-serialization/trans
 import { createInMemoryClientWithPeer } from 'libcardano/src/helper'
 import { InmemoryBlockchain } from 'libcardano/src/InmemoryBlockchain'
 import { BlockEvent } from 'libcardano/src/types'
-import { WebSocket } from 'ws'
 import { fetchAgentConfiguration } from '../repository/agent_manager_repository'
+import { Server } from 'rpc-websockets'
 
 const bigIntReplacer = (key: any, value: any) => {
     if (typeof value === 'bigint') {
@@ -14,7 +14,7 @@ const bigIntReplacer = (key: any, value: any) => {
 }
 
 class WebSocketConnectionManager {
-    activeConnections: { [key: string]: WebSocket } = {}
+    activeConnections: { [key: string]: Server } = {}
     blockchain: InmemoryBlockchain
 
     constructor() {
@@ -29,14 +29,15 @@ class WebSocketConnectionManager {
         })
     }
 
-    async webSocketConnected(
+    async sendAgentKeys(
         websocketAgentId: string,
-        websocket: WebSocket
+        websocket: Server
     ): Promise<void> {
         this.activeConnections[websocketAgentId] = websocket
         const addressApiUrl = `${process.env.API_SERVER}/api/agent/${websocketAgentId}/keys`
         const addressResponse = await axios.get(addressApiUrl)
-        websocket.send(
+        websocket.emit(
+            'message',
             JSON.stringify({
                 message: 'agent_keys',
                 payload: addressResponse.data,
@@ -49,8 +50,12 @@ class WebSocketConnectionManager {
         // Disconnect WebSocket connection of agent
         const existingWebSocket = this.activeConnections[websocketAgentId]
         if (existingWebSocket) {
-            delete this.activeConnections[websocketAgentId]
-            await existingWebSocket.close(1000, 'Connection closed')
+            // delete this.activeConnections[websocketAgentId]
+            await existingWebSocket.close()
+            this.activeConnections[websocketAgentId].emit(
+                'message',
+                `Agent with ${websocketAgentId} is closed ...`
+            )
         }
     }
 
@@ -73,9 +78,12 @@ class WebSocketConnectionManager {
                             instance_count: Number(instanceCount),
                             configurations,
                         }
-                        await websocket.send(JSON.stringify(updatedMessage))
+                        websocket.emit(
+                            'message',
+                            JSON.stringify(updatedMessage)
+                        )
                     } else {
-                        await websocket.send(JSON.stringify(message))
+                        websocket.emit('message', JSON.stringify(message))
                     }
                 } catch (error) {
                     console.log(
@@ -99,8 +107,12 @@ class WebSocketConnectionManager {
         // Remove previous WebSocket connection of agent if exists
         const existingWebSocket = this.activeConnections[websocketAgentId]
         if (existingWebSocket) {
-            delete this.activeConnections[websocketAgentId]
-            await existingWebSocket.close(1000, 'Establishing a new connection')
+            existingWebSocket.emit(
+                'message',
+                `Agent with ${websocketAgentId} is already connected.`
+            )
+            // delete this.activeConnections[websocketAgentId]
+            // await existingWebSocket.close(1000, 'Establishing a new connection')
         }
     }
 
@@ -124,12 +136,13 @@ class WebSocketConnectionManager {
             slotNo: block.slotNo,
         }
         Object.values(this.activeConnections).forEach((websocket) => {
-            websocket.send(JSON.stringify(data))
+            websocket.emit('message', JSON.stringify(data))
         })
 
         transactions.length &&
             Object.values(this.activeConnections).forEach((websocket) => {
-                websocket.send(
+                websocket.emit(
+                    'message',
                     JSON.stringify(
                         { message: 'on_chain_tx', transactions },
                         bigIntReplacer

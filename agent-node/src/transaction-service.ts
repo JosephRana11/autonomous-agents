@@ -97,7 +97,7 @@ class Kuber {
     }
 }
 
-const kuberService = {
+const kuberServiceBuilder = {
     submitTransaction(tx: any) {
         return {
             url: '/api/v1/tx/submit',
@@ -417,4 +417,4 @@ function buildApiObject(
     }
 }
 
-export default kuberService
+export default kuberServiceBuilder

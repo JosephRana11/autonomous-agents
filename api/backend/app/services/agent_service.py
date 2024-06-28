@@ -55,6 +55,8 @@ class AgentService:
         utxo = 0
         async with httpx.AsyncClient() as client:
             response = await client.get(f"{settings.KUBER_URL}/utxo?address={agent_with_keys.agent_address}")
+            if response.status_code != 200:
+                raise HTTPException(status_code=response.status_code, content=response.text)
             transactions = response.json()
             for transaction in transactions:
                 utxo = float(transaction.get("value", {}).get("lovelace", "0"))

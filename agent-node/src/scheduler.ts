@@ -1,7 +1,10 @@
 import { globalState } from './global'
 import cron, { ScheduledTask } from 'node-cron'
-import { sendDataToWebSocket } from '.'
-import kuberService from './transaction-service'
+import { kuberService } from '.'
+import kuberServiceBuilder from './transaction-service'
+import { configDotenv } from 'dotenv'
+
+configDotenv()
 
 // Define the types for the action parameter and action
 export interface ActionParameter {
@@ -38,7 +41,7 @@ function clearScheduledTasks() {
 
 type TriggerType = 'MANUAL' | 'EVENT' | 'CRON'
 
-function sendActionToWebSocket(
+function sendActionToManager(
     action: Action,
     trigger: boolean,
     payload: any = null,
@@ -51,7 +54,11 @@ function sendActionToWebSocket(
         payload,
         triggerType: triggerType,
     }
-    sendDataToWebSocket(JSON.stringify(actionWithTrigInfo))
+    kuberService.buildTx(
+        JSON.stringify(actionWithTrigInfo),
+        action.function_name
+    )
+    // sendDataToWebSocket(JSON.stringify(actionWithTrigInfo))
 }
 
 function getParameterValue(
@@ -74,13 +81,13 @@ export async function triggerAction(
     triggerType: TriggerType
 ) {
     if (Math.random() > probability || !globalState.agentWalletDetails) {
-        sendActionToWebSocket(action, false)
+        sendActionToManager(action, false)
     } else {
         const agentAddress = globalState.agentWalletDetails?.agent_address || ''
         let payload
         switch (action.function_name) {
             case 'SendAda Token':
-                payload = kuberService.transferADA(
+                payload = kuberServiceBuilder.transferADA(
                     [getParameterValue(action.parameter, 'Receiver Address')],
                     10,
                     globalState.agentWalletDetails.agent_address,
@@ -88,7 +95,7 @@ export async function triggerAction(
                 )
                 break
             case 'Delegation':
-                payload = kuberService.stakeDelegation(
+                payload = kuberServiceBuilder.stakeDelegation(
                     agentAddress,
                     globalState.agentWalletDetails.payment_signing_key,
                     globalState.agentWalletDetails.stake_signing_key,
@@ -97,7 +104,7 @@ export async function triggerAction(
                 )
                 break
             case 'Vote':
-                payload = kuberService.voteOnProposal(
+                payload = kuberServiceBuilder.voteOnProposal(
                     agentAddress,
                     globalState.agentWalletDetails.payment_signing_key,
                     globalState.agentWalletDetails.drep_id,
@@ -108,7 +115,7 @@ export async function triggerAction(
                 )
                 break
             case 'Info Action Proposal':
-                payload = kuberService.createInfoGovAction(
+                payload = kuberServiceBuilder.createInfoGovAction(
                     agentAddress,
                     globalState.agentWalletDetails.payment_signing_key,
                     getParameterValue(action.parameter, 'anchor_url'),
@@ -117,7 +124,7 @@ export async function triggerAction(
                 )
                 break
             case 'Proposal New Constitution':
-                payload = kuberService.proposeNewConstitution(
+                payload = kuberServiceBuilder.proposeNewConstitution(
                     agentAddress,
                     globalState.agentWalletDetails.payment_signing_key,
                     globalState.agentWalletDetails.stake_signing_key,
@@ -132,7 +139,7 @@ export async function triggerAction(
                 )
                 break
             case 'Drep Registration':
-                payload = kuberService.dRepRegistration(
+                payload = kuberServiceBuilder.dRepRegistration(
                     globalState.agentWalletDetails.stake_signing_key,
                     globalState.agentWalletDetails.stake_verification_key_hash,
                     agentAddress,
@@ -140,7 +147,7 @@ export async function triggerAction(
                 )
                 break
             case 'Drep deRegistration':
-                payload = kuberService.dRepDeRegistration(
+                payload = kuberServiceBuilder.dRepDeRegistration(
                     agentAddress,
                     globalState.agentWalletDetails.payment_signing_key,
                     globalState.agentWalletDetails.stake_signing_key,
@@ -148,7 +155,7 @@ export async function triggerAction(
                 )
                 break
             case 'Register Stake':
-                payload = kuberService.registerStake(
+                payload = kuberServiceBuilder.registerStake(
                     globalState.agentWalletDetails.stake_signing_key,
                     globalState.agentWalletDetails.stake_verification_key_hash,
                     globalState.agentWalletDetails.payment_signing_key,
@@ -156,7 +163,7 @@ export async function triggerAction(
                 )
                 break
             case 'Abstain Delegation':
-                payload = kuberService.abstainDelegations(
+                payload = kuberServiceBuilder.abstainDelegations(
                     [globalState.agentWalletDetails.stake_signing_key],
                     [
                         globalState.agentWalletDetails
@@ -169,7 +176,7 @@ export async function triggerAction(
             default:
                 return
         }
-        sendActionToWebSocket(action, true, payload, triggerType)
+        sendActionToManager(action, true, payload, triggerType)
     }
 }
 
