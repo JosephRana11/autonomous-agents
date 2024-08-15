@@ -46,7 +46,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: allure-results
-          path: tests/allure-results
+          path: tests/test-api/allure-results
 
   build_and_deploy_report:
     runs-on: ubuntu-latest
