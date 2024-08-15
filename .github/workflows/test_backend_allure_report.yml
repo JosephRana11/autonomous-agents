@@ -5,6 +5,7 @@ on:
     branches:
       - master
       - dev
+      - Enhancment/Workflow-Test-Report-Builder-
   workflow_dispatch:
 
 jobs:
