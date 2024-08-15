@@ -42,6 +42,16 @@ jobs:
           poetry install
           poetry run pytest --alluredir allure-results
         continue-on-error: true
+        env :
+            BASE_API_URL: ${{ vars.BASE_API_URL }}
+            USER_KEY : ${{ secrets.USER_KEY }}
+            USER_SIGNATURE : ${{ secrets.USER_SIGNATURE }}
+            ADMIN_KEY : ${{ secrets.ADMIN_KEY }}
+            ADMIN_SIGNATURE : ${{ secrets.ADMIN_SIGNATURE }}
+            AGENT_MANAGER_WS_URL : ${{ vars.AGENT_MANAGER_URL }}
+            AGENT_RUN_TIMOUT : ${{ vars.AGENT_RUN_TIMOUT }}
+            CARDANO_FAUCET_BASE_URL : ${{ vars.CARDANO_FAUCET_BASE_URL }}
+            CARDANO_FAUCET_API_KEY : ${{ secrets.CARDANO_FAUCET_API_KEY }}
 
       - name: Upload results
         uses: actions/upload-artifact@v3
@@ -67,16 +77,6 @@ jobs:
         with:
             allure_results: allure-results
             allure_history: allure-history
-        env :
-            BASE_API_URL: ${{ vars.BASE_API_URL }}
-            USER_KEY : ${{ secrets.USER_KEY }}
-            USER_SIGNATURE : ${{ secrets.USER_SIGNATURE }}
-            ADMIN_KEY : ${{ secrets.ADMIN_KEY }}
-            ADMIN_SIGNATURE : ${{ secrets.ADMIN_SIGNATURE }}
-            AGENT_MANAGER_WS_URL : ${{ vars.AGENT_MANAGER_URL }}
-            AGENT_RUN_TIMOUT : ${{ vars.AGENT_RUN_TIMOUT }}
-            CARDANO_FAUCET_BASE_URL : ${{ vars.CARDANO_FAUCET_BASE_URL }}
-            CARDANO_FAUCET_API_KEY : ${{ secrets.CARDANO_FAUCET_API_KEY }}
 
       - name: Deploy report to Github Pages
         if: always()
