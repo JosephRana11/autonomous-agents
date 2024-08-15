@@ -79,7 +79,24 @@ jobs:
         with:
             ref: gh-pages
             path: gh-pages
-  
+
+      - name: Register report
+        id: register-project
+        if: ${{success()}}
+        run: |
+              chmod +x ./register_report.sh
+              ./register_report.sh
+      - if: steps.register-project.outputs.project_exists != 'true'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+              publish_branch: gh-pages
+              destination_dir: project
+
+      - name: Generate report details
+        id: report-details
+        run: |
+                chmod +x ./generate_report_details.sh
+                ./generate_report_details.sh
 
       - name: Allure Report action from marketplace
         uses: simple-elf/allure-report-action@v1.7
@@ -87,6 +104,14 @@ jobs:
             gh_pages: gh-pages/test_backend_allure_report
             allure_results: allure-results
             allure_history: allure-history
+            keep_reports: 30
+            report_url: ${{steps.report-details.outputs.report_url}}
+            github_run_num: ${{steps.report-details.outputs.report_number}}
+
+      - name: Generate Latest Report
+        run: |
+              chmod +x ./generate_latest_report_redirect.sh
+              ./generate_latest_report_redirect.sh ${{steps.report-details.outputs.report_number}}
 
       - name: Deploy report to Github Pages
         if: always()
