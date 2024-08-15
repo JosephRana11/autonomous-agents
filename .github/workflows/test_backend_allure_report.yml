@@ -72,9 +72,19 @@ jobs:
           name: allure-results
           path: allure-results
 
+      - name: Load test report history
+        uses: actions/checkout@v3
+        if: always()
+        continue-on-error: true
+        with:
+            ref: gh-pages
+            path: gh-pages
+  
+
       - name: Allure Report action from marketplace
         uses: simple-elf/allure-report-action@v1.7
         with:
+            gh_pages: gh-pages/test_backend_allure_report
             allure_results: allure-results
             allure_history: allure-history
 
