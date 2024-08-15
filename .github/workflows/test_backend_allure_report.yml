@@ -89,8 +89,8 @@ jobs:
             allure_history: allure-history
 
       - name: Copy redirect file
-        run: |
-              echo "<!DOCTYPE html><html><head><meta http-equiv='refresh' content='0; url=https://josephrana11.github.io/autonomous-agents/test_backend_allure_report/${{github.run_number}}' /><title>Redirecting...</title></head><body><p>If you are not redirected, <a href='https://josephrana11.github.io/autonomous-agents/test_backend_allure_report/${{github.run_number}}'>click here</a>.</p></body></html>" > allure-history/index.html
+            run: echo "<!DOCTYPE html><html><head><meta http-equiv='refresh' content='0; url=https://josephrana11.github.io/autonomous-agents/test_backend_allure_report/${{github.run_number}}' /><title>Redirecting...</title></head><body><p>If you are not redirected, <a href='https://josephrana11.github.io/autonomous-agents/test_backend_allure_report/${{github.run_number}}'>click here</a>.</p></body></html>" | tee allure-history/index.html
+          
 
       - name: Deploy report to Github Pages
         if: always()
