@@ -101,6 +101,7 @@ def run_admin_agent_fixture(
     try:
         # Run agent-node with yarn and environment variables
         subprocess.run(["yarn", "install"], cwd=project_path, env=env, check=True)
+        time.sleep(10)
         process = subprocess.Popen(
             ["yarn", "start"],
             cwd=project_path,
