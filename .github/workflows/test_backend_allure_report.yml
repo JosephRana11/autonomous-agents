@@ -87,7 +87,7 @@ jobs:
             gh_pages: gh-pages/test_backend_allure_report
             allure_results: allure-results
             allure_history: allure-history
-            report_url : https://josephrana11.github.io/autonomous-agents/test_backend_allure_report/${{github.run_number}}
+            report_url : https://josephrana11.github.io/autonomous-agents/test_backend_allure_report
 
       - name: Deploy report to Github Pages
         if: always()
@@ -97,4 +97,3 @@ jobs:
               publish_dir: allure-history
               publish_branch: gh-pages
               destination_dir: test_backend_allure_report
-
