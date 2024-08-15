@@ -3,7 +3,8 @@ name: Backend Allure Test and Deploy
 on:
   push:
     branches:
-      - main
+      - master
+      - dev
   workflow_dispatch:
 
 jobs:
