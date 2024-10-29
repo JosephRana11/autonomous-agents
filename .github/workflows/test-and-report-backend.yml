@@ -107,6 +107,6 @@ jobs:
       - name: Fail if tests failed
         if: ${{ hashFiles('test-failure.log') != '' }}
         run: |
-          echo "Tests failed!"
+          echo "Tests cases have failed!"
           exit 1
 
