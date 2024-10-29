@@ -110,6 +110,7 @@ def run_admin_agent_fixture(
     env["WS_URL"] = env.get("AGENT_MANAGER_WS_URL")
     env["AGENT_ID"] = agent_id
     env['TOKEN'] = convert_to_base64_with_network_prefix(agent_secret_key, env.get("NETWORK"))
+    env["ENV"] = env.get("NETWORK" , "sanchonet")
 
     logger.info(f"token: {env['TOKEN']}")
 
