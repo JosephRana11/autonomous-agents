@@ -83,11 +83,14 @@ jobs:
 
       - name: Allure Report action from marketplace
         uses: simple-elf/allure-report-action@v1.7
+        env:
+              REPORT_URL: ${{ vars.ALLURE_REPORT_URL || 'https://cardanoapi.github.io/autonomous-agents/test_backend_allure_report' }}
         with:
-            gh_pages: gh-pages/test_backend_allure_report
-            allure_results: allure-results
-            allure_history: allure-history
-            report_url : https://cardanoapi.github.io/autonomous-agents/test_backend_allure_report
+              gh_pages: gh-pages/test_backend_allure_report
+              allure_results: allure-results
+              allure_history: allure-history
+              report_url: ${{ env.REPORT_URL }}
+          
 
       - name: Deploy report to Github Pages
         if: always()
