@@ -1,0 +1,4 @@
+"Status","Start Time","Stop Time","Duration in ms","Parent Suite","Suite","Sub Suite","Test Class","Test Method","Name","Description"
+"passed","Tue Oct 29 07:04:45 GMT 2024","Tue Oct 29 07:04:45 GMT 2024","255","Agent Management","test_agent","TestAgentManagement","","","Test Get Admin Agent",""
+"passed","Tue Oct 29 07:04:41 GMT 2024","Tue Oct 29 07:04:44 GMT 2024","2971","Agent Management","test_agent","TestAgentManagement","","","Test Agents List",""
+"passed","Tue Oct 29 07:04:45 GMT 2024","Tue Oct 29 07:04:45 GMT 2024","0","Agent Management","test_agent","TestAgentManagement","","","Test Admin Agent Edit",""
