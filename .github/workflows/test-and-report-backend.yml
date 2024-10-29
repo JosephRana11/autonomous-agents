@@ -59,6 +59,10 @@ jobs:
           name: allure-results
           path: tests/test-api/allure-results
 
+      - name: Record test failure status
+        if: failure()
+        run: echo "Tests failed" > test-failure.log
+
   build_and_deploy_report:
     runs-on: ubuntu-latest
     needs: backend_tests
@@ -83,13 +87,11 @@ jobs:
 
       - name: Allure Report action from marketplace
         uses: simple-elf/allure-report-action@v1.7
-        env:
-              REPORT_URL: ${{ vars.ALLURE_REPORT_URL || 'https://cardanoapi.github.io/autonomous-agents/test_backend_allure_report' }}
         with:
               gh_pages: gh-pages/test_backend_allure_report
               allure_results: allure-results
               allure_history: allure-history
-              report_url: ${{ env.REPORT_URL }}
+              report_url: https://josephrana11.github.io/autonomous-agents/test_backend_allure_report
           
 
       - name: Deploy report to Github Pages
@@ -100,4 +102,11 @@ jobs:
               publish_dir: allure-history
               publish_branch: gh-pages
               destination_dir: test_backend_allure_report
+      
+
+      - name: Fail if tests failed
+        if: failure()
+        run: |
+          echo "Tests failed!"
+          exit 1
 
