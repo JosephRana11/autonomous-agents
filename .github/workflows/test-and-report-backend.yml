@@ -1,17 +1,12 @@
 name: Backend/Agent Functions Test and Report
 
 on:
-  push:
-    branches:
-      - master
-      - dev
-      - test
-  workflow_dispatch:
-  
   workflow_run:
     workflows: ["Docker Build and Deploy"]
     types:
       - completed
+  
+  workflow_dispatch:
 
 jobs:
   backend_tests:
