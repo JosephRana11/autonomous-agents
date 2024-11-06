@@ -1,4 +1,4 @@
-name: Backend Allure Test and Deploy
+name: Backend/Agent Functions Test and Report
 
 on:
   push:
@@ -7,6 +7,11 @@ on:
       - dev
       - test
   workflow_dispatch:
+  
+  workflow_run:
+    workflows: ["Docker Build and Deploy"]
+    types:
+      - completed
 
 jobs:
   backend_tests:
@@ -87,7 +92,7 @@ jobs:
             gh_pages: gh-pages/test_backend_allure_report
             allure_results: allure-results
             allure_history: allure-history
-            report_url : https://cardanoapi.github.io/autonomous-agents/test_backend_allure_report
+            report_url: https://josephrana11.github.io/autonomous-agents/test_backend_allure_report
 
       - name: Deploy report to Github Pages
         if: always()
